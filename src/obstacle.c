@@ -47,3 +47,27 @@ void liberar_obstaculos(Obstacle *lista) {
         atual = proximo;
     }
 }
+
+void remover_obstaculos_fora_da_tela(Obstacle **lista) {
+    Obstacle *atual = *lista;
+    Obstacle *anterior = NULL;
+
+    while (atual != NULL) {
+        if (atual->rect.y > SCREEN_HEIGHT) {
+            Obstacle *remover = atual;
+
+            if (anterior == NULL) {
+                *lista = atual->next;
+                atual = *lista;
+            } else {
+                anterior->next = atual->next;
+                atual = atual->next;
+            }
+
+            free(remover);
+        } else {
+            anterior = atual;
+            atual = atual->next;
+        }
+    }
+}

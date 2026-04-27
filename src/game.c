@@ -24,6 +24,7 @@ void atualizar_jogo(Game *game, float delta) {
 
     atualizar_player(game->player, delta);
     atualizar_obstaculos(game->obstacles, delta);
+    remover_obstaculos_fora_da_tela(&game->obstacles);
 }
 
 void desenhar_jogo(Game *game) {

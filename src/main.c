@@ -1,7 +1,6 @@
 #include "raylib.h"
 #include "config.h"
-#include "player.h"
-#include "obstacle.h"
+#include "game.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -11,37 +10,22 @@ int main() {
 
     srand(time(NULL));
 
-    Player *player = criar_player();
-    Obstacle *obstacles = NULL;
-
-    float timerSpawn = 0;
+    Game *game = criar_jogo();
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
 
-        timerSpawn += delta;
-
-        if (timerSpawn >= 1.0f) {
-            adicionar_obstaculo(&obstacles);
-            timerSpawn = 0;
-        }
-
-        atualizar_player(player, delta);
-        atualizar_obstaculos(obstacles, delta);
+        atualizar_jogo(game, delta);
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        DrawRectangle(250, 0, 300, SCREEN_HEIGHT, DARKGRAY);
-
-        desenhar_player(player);
-        desenhar_obstaculos(obstacles);
+        desenhar_jogo(game);
 
         EndDrawing();
     }
 
-    liberar_obstaculos(obstacles);
-    liberar_player(player);
+    liberar_jogo(game);
 
     CloseWindow();
 

@@ -19,3 +19,31 @@ void adicionar_obstaculo(Obstacle **lista) {
     novo->next = *lista;
     *lista = novo;
 }
+
+void atualizar_obstaculos(Obstacle *lista, float delta) {
+    Obstacle *atual = lista;
+
+    while (atual != NULL) {
+        atual->rect.y += atual->velocidade * delta;
+        atual = atual->next;
+    }
+}
+
+void desenhar_obstaculos(Obstacle *lista) {
+    Obstacle *atual = lista;
+
+    while (atual != NULL) {
+        DrawRectangleRec(atual->rect, BLACK);
+        atual = atual->next;
+    }
+}
+
+void liberar_obstaculos(Obstacle *lista) {
+    Obstacle *atual = lista;
+
+    while (atual != NULL) {
+        Obstacle *proximo = atual->next;
+        free(atual);
+        atual = proximo;
+    }
+}

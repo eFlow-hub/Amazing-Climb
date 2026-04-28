@@ -55,6 +55,7 @@ void remover_obstaculos_fora_da_tela(Obstacle **lista, int *score) {
             }
 
             free(remover);
+            (*score)++;
         } else {
             anterior = atual;
             atual = atual->next;

@@ -38,7 +38,7 @@ void desenhar_obstaculos(Obstacle *lista) {
     }
 }
 
-void remover_obstaculos_fora_da_tela(Obstacle **lista) {
+void remover_obstaculos_fora_da_tela(Obstacle **lista, int *score) {
     Obstacle *atual = *lista;
     Obstacle *anterior = NULL;
 

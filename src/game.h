@@ -8,6 +8,8 @@ typedef struct Game {
     Player *player;
     Obstacle *obstacles;
     float timerSpawn;
+    int invencibilidade;
+    int score;
     int gameOver;
 } Game;
 

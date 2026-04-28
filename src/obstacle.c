@@ -3,21 +3,42 @@
 #include <stdlib.h>
 
 void adicionar_obstaculo(Obstacle **lista) {
-    Obstacle *novo = malloc(sizeof(Obstacle));
+    int quantidade = GetRandomValue(1, 2); 
+    int faixaBloqueada1 = GetRandomValue(0, LANE_COUNT - 1);
+    int faixaBloqueada2 = faixaBloqueada1;
 
-    if (novo == NULL) {
-        return;
+    if (quantidade == 2) {
+        do {
+            faixaBloqueada2 = GetRandomValue(0, LANE_COUNT - 1);
+        } while (faixaBloqueada2 == faixaBloqueada1);
     }
 
-    novo->rect.x = rand() % (SCREEN_WIDTH - OBSTACLE_WIDTH);
-    novo->rect.y = -OBSTACLE_HEIGHT;
-    novo->rect.width = OBSTACLE_WIDTH;
-    novo->rect.height = OBSTACLE_HEIGHT;
+    for (int i = 0; i < quantidade; i++) {
+        int lane;
 
-    novo->velocidade = OBSTACLE_SPEED;
+        if (i == 0) {
+            lane = faixaBloqueada1;
+        } else {
+            lane = faixaBloqueada2;
+        }
 
-    novo->next = *lista;
-    *lista = novo;
+        Obstacle *novo = malloc(sizeof(Obstacle));
+
+        if (novo == NULL) {
+            return;
+        }
+
+        novo->rect.width = OBSTACLE_WIDTH;
+        novo->rect.height = OBSTACLE_HEIGHT;
+
+        novo->rect.x = BUILDING_X + lane * LANE_WIDTH + LANE_WIDTH / 2 - OBSTACLE_WIDTH / 2;
+        novo->rect.y = -OBSTACLE_HEIGHT;
+
+        novo->velocidade = OBSTACLE_SPEED;
+
+        novo->next = *lista;
+        *lista = novo;
+    }
 }
 
 void atualizar_obstaculos(Obstacle *lista, float delta) {

@@ -38,16 +38,6 @@ void desenhar_obstaculos(Obstacle *lista) {
     }
 }
 
-void liberar_obstaculos(Obstacle *lista) {
-    Obstacle *atual = lista;
-
-    while (atual != NULL) {
-        Obstacle *proximo = atual->next;
-        free(atual);
-        atual = proximo;
-    }
-}
-
 void remover_obstaculos_fora_da_tela(Obstacle **lista) {
     Obstacle *atual = *lista;
     Obstacle *anterior = NULL;
@@ -72,3 +62,12 @@ void remover_obstaculos_fora_da_tela(Obstacle **lista) {
     }
 }
 
+void liberar_obstaculos(Obstacle *lista) {
+    Obstacle *atual = lista;
+
+    while (atual != NULL) {
+        Obstacle *proximo = atual->next;
+        free(atual);
+        atual = proximo;
+    }
+}

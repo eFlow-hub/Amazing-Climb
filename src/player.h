@@ -6,6 +6,7 @@
 typedef struct Player {
     Rectangle rect;
     int vidas;
+    int lane;
     float velocidade;
 } Player;
 

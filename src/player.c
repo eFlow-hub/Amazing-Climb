@@ -9,10 +9,13 @@ Player *criar_player() {
         return NULL;
     }
 
-    player->rect.x = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2;
-    player->rect.y = SCREEN_HEIGHT - 120;
+    player->lane = 1;
+
     player->rect.width = PLAYER_WIDTH;
     player->rect.height = PLAYER_HEIGHT;
+
+    player->rect.x = BUILDING_X + player->lane * LANE_WIDTH + LANE_WIDTH / 2 - PLAYER_WIDTH / 2;
+    player->rect.y = SCREEN_HEIGHT - 120;
 
     player->vidas = 3;
     player->velocidade = PLAYER_SPEED;
@@ -21,21 +24,15 @@ Player *criar_player() {
 }
 
 void atualizar_player(Player *player, float delta) {
-    if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
-        player->rect.x -= player->velocidade * delta;
+    if ((IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) && player->lane > 0) {
+        player->lane--;
     }
 
-    if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-        player->rect.x += player->velocidade * delta;
+    if ((IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) && player->lane < LANE_COUNT - 1) {
+        player->lane++;
     }
 
-    if (player->rect.x < 0) {
-        player->rect.x = 0;
-    }
-
-    if (player->rect.x + player->rect.width > SCREEN_WIDTH) {
-        player->rect.x = SCREEN_WIDTH - player->rect.width;
-    }
+    player->rect.x = BUILDING_X + player->lane * LANE_WIDTH + LANE_WIDTH / 2 - PLAYER_WIDTH / 2;
 }
 
 void desenhar_player(Player *player) {

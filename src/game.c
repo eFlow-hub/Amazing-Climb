@@ -42,7 +42,8 @@ void verificar_colisoes(Game *game) {
             free(atual);
 
             if (game->player->vidas <= 0) {
-                game->gameOver = GAME_OVER;
+                game->gameOver = 1;
+                game->screen = GAME_OVER;
                 if (game->score > game->bestScore) {
                     game->bestScore = game->score;
                 }
@@ -57,7 +58,7 @@ void verificar_colisoes(Game *game) {
 }
 
 void atualizar_jogo(Game *game, float delta) {
-    if (game->screen == GAMEOVER) {
+    if (game->screen == GAME_OVER) {
         if (IsKeyPressed(KEY_R)) {
             reiniciar_partida(game);
         }

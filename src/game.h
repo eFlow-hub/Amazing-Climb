@@ -10,8 +10,16 @@ typedef struct Game {
     float timerSpawn;
     int invencibilidade;
     int score;
+    int bestScore;
     int gameOver;
+    GameScreen screen;
 } Game;
+
+typedef struct GameScreen{
+    MENU,
+    PLAYING,
+    GAMEOVER
+} GameScreen;
 
 Game *criar_jogo();
 void atualizar_jogo(Game *game, float delta);

@@ -15,6 +15,8 @@ Game *criar_jogo() {
     game->gameOver = 0;
     game->invencibilidade = 0;
     game->score = 0;
+    game->bestScore = 0;
+    game->screen = MENU;
 
     return game;
 }
@@ -40,7 +42,10 @@ void verificar_colisoes(Game *game) {
             free(atual);
 
             if (game->player->vidas <= 0) {
-                game->gameOver = 1;
+                game->gameOver = GAME_OVER;
+                if (game->score > game->bestScore) {
+                    game->bestScore = game->score;
+                }
             }
 
             return;
@@ -52,6 +57,29 @@ void verificar_colisoes(Game *game) {
 }
 
 void atualizar_jogo(Game *game, float delta) {
+    if (game->screen == GAMEOVER) {
+        if (IsKeyPressed(KEY_R)) {
+            reiniciar_partida(game);
+        }
+
+        if (IsKeyPressed(KEY_M)) {
+            game->screen = MENU;
+        }
+
+        return;
+    }
+
+    if (game->screen == MENU) {
+        if (IsKeyPressed(KEY_ENTER)) {
+            reiniciar_partida(game);
+        }
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            CloseWindow();
+        }
+
+        return;
+    }
+
     if (game->gameOver) {
         return;
     }
@@ -73,6 +101,24 @@ void atualizar_jogo(Game *game, float delta) {
 }
 
 void desenhar_jogo(Game *game) {
+
+    if (game->screen == MENU) {
+        DrawText("HOMEM-ARANHA NO PREDIO", 190, 150, 30, RED);
+        DrawText("ENTER - Iniciar", 300, 250, 24, BLACK);
+        DrawText(TextFormat("Recorde: %d", game->bestScore), 315, 300, 24, BLACK);
+        DrawText("ESC - Sair", 330, 350, 24, BLACK);
+        return;
+    }
+
+    if (game->screen == GAME_OVER) {
+    DrawText("GAME OVER", 290, 220, 40, RED);
+    DrawText(TextFormat("Score: %d", game->score), 330, 280, 24, BLACK);
+    DrawText(TextFormat("Recorde: %d", game->bestScore), 315, 320, 24, BLACK);
+    DrawText("R - Reiniciar", 310, 380, 24, BLACK);
+    DrawText("M - Voltar ao Menu", 270, 420, 24, BLACK);
+    return;
+    }
+
     DrawRectangle(250, 0, 300, SCREEN_HEIGHT, DARKGRAY);
 
     desenhar_player(game->player);
@@ -90,4 +136,17 @@ void liberar_jogo(Game *game) {
     liberar_obstaculos(game->obstacles);
     liberar_player(game->player);
     free(game);
+}
+
+void reiniciar_partida(Game *game){
+    liberar_obstaculos(game->obstacles);
+    liberar_player(game->player);
+
+    game->player = criar_player();
+    game->obstacles = NULL;
+    game->timerSpawn = 0;
+    game->invencibilidade = 0;
+    game->score = 0;
+    game->gameOver = 0;
+    game->screen = PLAYING;
 }

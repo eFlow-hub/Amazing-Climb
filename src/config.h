@@ -4,7 +4,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-#define GAME_TITLE "Homem-Aranha Subindo o Predio"
+#define GAME_TITLE "Amazing Climb"
 
 #define PLAYER_WIDTH 50
 #define PLAYER_HEIGHT 70

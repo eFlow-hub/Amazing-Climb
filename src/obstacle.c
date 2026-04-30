@@ -54,7 +54,16 @@ void desenhar_obstaculos(Obstacle *lista) {
     Obstacle *atual = lista;
 
     while (atual != NULL) {
-        DrawRectangleRec(atual->rect, BLACK);
+        Rectangle r = atual->rect;
+        
+        //corpo
+        DrawRectangleRec(r, BROWN);
+        DrawRectangleLinesEx(r, 3, DARKBROWN);
+
+        //detalhes
+        DrawLine(r.x, r.y, r.x + r.width, r.y + r.height, DARKBROWN);
+        DrawLine(r.x + r.width, r.y, r.x, r.y + r.height, DARKBROWN);
+
         atual = atual->next;
     }
 }

@@ -36,7 +36,24 @@ void atualizar_player(Player *player, float delta) {
 }
 
 void desenhar_player(Player *player) {
-    DrawRectangleRec(player->rect, RED);
+    Rectangle r = player->rect;
+
+    //corpo
+    DrawRectangleRec(r, RED);
+
+    //cabeça
+    DrawCircle(r.x + r.width / 2, r.y - 10, 18, RED);
+
+    //olhos
+    DrawCircle(r.x + 15, r.y - 13, 5, WHITE);
+    DrawCircle(r.x + 35, r.y - 13, 5, WHITE);
+
+    //detalhes azuis
+    DrawRectangle(r.x + 8, r.y + 25, 12, 35, BLUE);
+    DrawRectangle(r.x + 30, r.y + 25, 12, 35, BLUE);
+
+    //contorno
+    DrawRectangleLinesEx(r, 2, BLACK);
 }
 
 void liberar_player(Player *player) {

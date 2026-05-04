@@ -18,6 +18,7 @@ typedef struct Game {
     int score;
     int bestScore;
     int gameOver;
+    float backgroundOffset;
     GameScreen screen;
 } Game;
 

@@ -20,6 +20,12 @@ Player *criar_player() {
     player->vidas = 3;
     player->velocidade = PLAYER_SPEED;
 
+    player->frame1 = LoadTexture("assets/images/spider1.png");
+    player->frame2 = LoadTexture("assets/images/spider2.png");
+    
+    player->frameAtual = 0;
+    player->animtimer = 0;
+
     return player;
 }
 
@@ -33,29 +39,35 @@ void atualizar_player(Player *player, float delta) {
     }
 
     player->rect.x = BUILDING_X + player->lane * LANE_WIDTH + LANE_WIDTH / 2 - PLAYER_WIDTH / 2;
+
+    player->animtimer += delta;
+    if (player->animtimer >= 0.2f) {
+        player->frameAtual = player->frameAtual;
+        player->animtimer = 0;
+    }
 }
 
 void desenhar_player(Player *player) {
-    Rectangle r = player->rect;
+    Texture2D textura;
 
-    //corpo
-    DrawRectangleRec(r, RED);
+    if (player->frameAtual == 0) {
+        textura = player->frame1;
+    } else {
+        textura = player->frame2;
+    }
 
-    //cabeça
-    DrawCircle(r.x + r.width / 2, r.y - 10, 18, RED);
-
-    //olhos
-    DrawCircle(r.x + 15, r.y - 13, 5, WHITE);
-    DrawCircle(r.x + 35, r.y - 13, 5, WHITE);
-
-    //detalhes azuis
-    DrawRectangle(r.x + 8, r.y + 25, 12, 35, BLUE);
-    DrawRectangle(r.x + 30, r.y + 25, 12, 35, BLUE);
-
-    //contorno
-    DrawRectangleLinesEx(r, 2, BLACK);
+    DrawTexturePro(
+        textura,
+        (Rectangle){0, 0, textura.width, textura.height},
+        player->rect,
+        (Vector2){0, 0},
+        0,
+        WHITE
+    );
 }
 
 void liberar_player(Player *player) {
+    UnloadTexture(player->frame1);
+    UnloadTexture(player->frame2);
     free(player);
 }

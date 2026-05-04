@@ -8,6 +8,11 @@ typedef struct Player {
     int vidas;
     int lane;
     float velocidade;
+
+    Texture2D frame1;
+    Texture2D frame2;
+    int frameAtual;
+    float animtimer;
 } Player;
 
 Player *criar_player();

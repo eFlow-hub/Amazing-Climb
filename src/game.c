@@ -17,6 +17,7 @@ Game *criar_jogo() {
     game->score = 0;
     game->bestScore = 0;
     game->screen = MENU;
+    game->backgroundOffset = 0;
 
     return game;
 }
@@ -84,6 +85,13 @@ void atualizar_jogo(Game *game, float delta) {
     if (game->gameOver) {
         return;
     }
+
+    game->backgroundOffset += 120 * delta;
+
+    if (game->backgroundOffset >= 90){
+        game->backgroundOffset = 0;
+    }
+
     if (game->invencibilidade > 0) {
         game->invencibilidade -= delta;
     }
@@ -102,7 +110,6 @@ void atualizar_jogo(Game *game, float delta) {
 }
 
 void desenhar_jogo(Game *game) {
-
     if (game->screen == MENU) {
         DrawText("HOMEM-ARANHA NO PREDIO", 190, 150, 30, RED);
         DrawText("ENTER - Iniciar", 300, 250, 24, BLACK);
@@ -112,60 +119,37 @@ void desenhar_jogo(Game *game) {
     }
 
     if (game->screen == GAME_OVER) {
-    DrawText("GAME OVER", 290, 220, 40, RED);
-    DrawText(TextFormat("Score: %d", game->score), 330, 280, 24, BLACK);
-    DrawText(TextFormat("Recorde: %d", game->bestScore), 315, 320, 24, BLACK);
-    DrawText("R - Reiniciar", 310, 380, 24, BLACK);
-    DrawText("M - Voltar ao Menu", 270, 420, 24, BLACK);
-    return;
+        DrawText("GAME OVER", 290, 220, 40, RED);
+        DrawText(TextFormat("Score: %d", game->score), 330, 280, 24, BLACK);
+        DrawText(TextFormat("Recorde: %d", game->bestScore), 315, 320, 24, BLACK);
+        DrawText("R - Reiniciar", 310, 380, 24, BLACK);
+        DrawText("M - Voltar ao Menu", 270, 420, 24, BLACK);
+        return;
     }
 
-    // Fundo
-    ClearBackground((Color){ 135, 206, 235, 255 });
+    DrawRectangle(BUILDING_X, 0, BUILDING_WIDTH, SCREEN_HEIGHT, DARKGRAY);
 
-    // Prédios
-    DrawRectangle(40, 180, 120, SCREEN_HEIGHT, (Color){90, 90, 110, 255});
-    DrawRectangle(620, 120, 140, SCREEN_HEIGHT, (Color){80, 80, 100, 255});
-    DrawRectangle(170, 260, 80, SCREEN_HEIGHT, (Color){100, 100, 120, 255});
-    
-    // prédio principal
-    DrawRectangle(BUILDING_X, 0, BUILDING_WIDTH, SCREEN_HEIGHT, (Color){55, 55, 65, 255});
-    
-    // Detalhes do prédio
-    DrawRectangleLinesEx(
-    (Rectangle){BUILDING_X, 0, BUILDING_WIDTH, SCREEN_HEIGHT},
-    4,
-    BLACK
-    );
-    
-    // Janelas do prédio
-    for (int y = 40; y < SCREEN_HEIGHT; y += 90) {
+    for (int y = -90 + game->backgroundOffset; y < SCREEN_HEIGHT; y += 90) {
         for (int lane = 0; lane < LANE_COUNT; lane++) {
-        int x = BUILDING_X + lane * LANE_WIDTH + 30;
+            int x = BUILDING_X + lane * LANE_WIDTH + 30;
 
-        DrawRectangle(x, y, 40, 35, (Color){255, 230, 120, 255});
-        DrawRectangleLines(x, y, 40, 35, BLACK);
+            DrawRectangle(x, y, 40, 35, YELLOW);
+            DrawRectangleLines(x, y, 40, 35, BLACK);
         }
     }
 
-    // Linhas das faixas
-    DrawLine(BUILDING_X + LANE_WIDTH, 0, BUILDING_X + LANE_WIDTH, SCREEN_HEIGHT, GRAY);
-    DrawLine(BUILDING_X + LANE_WIDTH * 2, 0, BUILDING_X + LANE_WIDTH * 2, SCREEN_HEIGHT, GRAY);
-    
-    // Player e obstáculos
+    DrawLine(BUILDING_X + LANE_WIDTH, 0,
+             BUILDING_X + LANE_WIDTH, SCREEN_HEIGHT, GRAY);
+
+    DrawLine(BUILDING_X + LANE_WIDTH * 2, 0,
+             BUILDING_X + LANE_WIDTH * 2, SCREEN_HEIGHT, GRAY);
+
     desenhar_player(game->player);
     desenhar_obstaculos(game->obstacles);
-    
-    // HUD
+
     DrawText(TextFormat("Vidas: %d", game->player->vidas), 20, 20, 24, BLACK);
     DrawText(TextFormat("Score: %d", game->score), 20, 50, 24, BLACK);
-    
-    // Tela de Game Over
-    if (game->gameOver) {
-        DrawText("GAME OVER", 300, 280, 40, RED);
-    }
 }
-
 void liberar_jogo(Game *game) {
     liberar_obstaculos(game->obstacles);
     liberar_player(game->player);

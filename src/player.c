@@ -42,7 +42,7 @@ void atualizar_player(Player *player, float delta) {
 
     player->animtimer += delta;
     if (player->animtimer >= 0.2f) {
-        player->frameAtual = player->frameAtual;
+        player->frameAtual = !player->frameAtual;
         player->animtimer = 0;
     }
 }

@@ -144,7 +144,7 @@ void desenhar_jogo(Game *game) {
     DrawLine(BUILDING_X + LANE_WIDTH * 2, 0,
              BUILDING_X + LANE_WIDTH * 2, SCREEN_HEIGHT, GRAY);
 
-    desenhar_player(game->player);
+    desenhar_player(game->player, game->invencibilidade);
     desenhar_obstaculos(game->obstacles);
 
     DrawText(TextFormat("Vidas: %d", game->player->vidas), 20, 20, 24, BLACK);

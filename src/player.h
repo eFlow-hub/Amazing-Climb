@@ -17,7 +17,7 @@ typedef struct Player {
 
 Player *criar_player();
 void atualizar_player(Player *player, float delta);
-void desenhar_player(Player *player);
+void desenhar_player(Player *player, float invencibilidade);
 void liberar_player(Player *player);
 
 #endif

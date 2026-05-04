@@ -47,14 +47,18 @@ void atualizar_player(Player *player, float delta) {
     }
 }
 
-void desenhar_player(Player *player) {
-    Texture2D textura;
+void desenhar_player(Player *player, float invencibilidade) {
+    if (invencibilidade > 0) {
+        int piscar = ((int)(invencibilidade * 10)) % 2;
 
-    if (player->frameAtual == 0) {
-        textura = player->frame1;
-    } else {
-        textura = player->frame2;
+        if (piscar == 0) {
+            return;
+        }
     }
+
+    Texture2D textura = player->frameAtual == 0
+        ? player->frame1
+        : player->frame2;
 
     DrawTexturePro(
         textura,

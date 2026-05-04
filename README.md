@@ -295,3 +295,13 @@ Se quiser, próximo passo a gente pode:
 
 
 
+
+possiveis proximas atts:
+
+1. Adicionar som de colisão
+2. Colocar sprites nos obstáculos
+3. Criar tela de vitória ou objetivo final
+4. Salvar recorde em arquivo
+5. Melhorar menu visual
+6. Adicionar dificuldade progressiva leve
+7. Adicionar efeito de tela tremendo ao bater

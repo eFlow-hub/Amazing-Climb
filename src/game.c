@@ -19,6 +19,8 @@ Game *criar_jogo() {
     game->screen = MENU;
     game->backgroundOffset = 0;
 
+    carregar_texturas_obstaculos();
+
     return game;
 }
 
@@ -151,6 +153,7 @@ void desenhar_jogo(Game *game) {
     DrawText(TextFormat("Score: %d", game->score), 20, 50, 24, BLACK);
 }
 void liberar_jogo(Game *game) {
+    descarregar_texturas_obstaculos();
     liberar_obstaculos(game->obstacles);
     liberar_player(game->player);
     free(game);

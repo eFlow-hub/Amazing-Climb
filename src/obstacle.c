@@ -1,6 +1,19 @@
 #include "obstacle.h"
 #include "config.h"
 #include <stdlib.h>
+static Texture2D obstaculoTexturas[3];
+
+void carregar_texturas_obstaculos() {
+    obstaculoTexturas[0] = LoadTexture("assets/images/obstaculo1.png");
+    obstaculoTexturas[1] = LoadTexture("assets/images/obstaculo2.png");
+    obstaculoTexturas[2] = LoadTexture("assets/images/obstaculo3.png");
+}
+
+void descarregar_texturas_obstaculos() {
+    for (int i = 0; i < 3; i++) {
+        UnloadTexture(obstaculoTexturas[i]);
+    }
+}
 
 void adicionar_obstaculo(Obstacle **lista) {
     int quantidade = GetRandomValue(1, 2); 
@@ -36,6 +49,8 @@ void adicionar_obstaculo(Obstacle **lista) {
 
         novo->velocidade = OBSTACLE_SPEED;
 
+        novo->tipo = GetRandomValue(0, 2);
+
         novo->next = *lista;
         *lista = novo;
     }
@@ -54,15 +69,16 @@ void desenhar_obstaculos(Obstacle *lista) {
     Obstacle *atual = lista;
 
     while (atual != NULL) {
-        Rectangle r = atual->rect;
-        
-        //corpo
-        DrawRectangleRec(r, BROWN);
-        DrawRectangleLinesEx(r, 3, DARKBROWN);
+        Texture2D textura = obstaculoTexturas[atual->tipo];
 
-        //detalhes
-        DrawLine(r.x, r.y, r.x + r.width, r.y + r.height, DARKBROWN);
-        DrawLine(r.x + r.width, r.y, r.x, r.y + r.height, DARKBROWN);
+        DrawTexturePro(
+            textura,
+            (Rectangle){0, 0, textura.width, textura.height},
+            atual->rect,
+            (Vector2){0, 0},
+            0,
+            WHITE
+        );
 
         atual = atual->next;
     }

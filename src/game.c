@@ -191,8 +191,8 @@ void desenhar_jogo(Game *game) {
     desenhar_player(game->player, game->invencibilidade);
     desenhar_obstaculos(game->obstacles);
 
-    DrawText(TextFormat("Vidas: %d", game->player->vidas), 20, 20, 24, BLACK);
-    DrawText(TextFormat("Score: %d", game->score), 20, 50, 24, BLACK);
+    DrawText(TextFormat("Vidas: %d", game->player->vidas), 20, 20, 24, WHITE);
+    DrawText(TextFormat("Score: %d", game->score), 20, 50, 24, WHITE);
 }
 void liberar_jogo(Game *game) {
     descarregar_texturas_obstaculos();

@@ -31,6 +31,7 @@ Game *criar_jogo() {
     game->fundoframes[9] = LoadTexture("assets/images/fundo/frame_09.png");
     game->frameAtualFundo = 0;
     game->timerFundo = 0;
+    game->gameOverTexture = LoadTexture("assets/images/gameover.png");
     carregar_texturas_obstaculos();
 
     return game;
@@ -152,11 +153,18 @@ void desenhar_jogo(Game *game) {
     }
 
     if (game->screen == GAME_OVER) {
-        DrawText("GAME OVER", 290, 220, 40, RED);
-        DrawText(TextFormat("Score: %d", game->score), 330, 280, 24, BLACK);
-        DrawText(TextFormat("Recorde: %d", game->bestScore), 315, 320, 24, BLACK);
-        DrawText("R - Reiniciar", 310, 380, 24, BLACK);
-        DrawText("M - Voltar ao Menu", 270, 420, 24, BLACK);
+        DrawTexturePro(
+            game->gameOverTexture,
+            (Rectangle){0, 0, game->gameOverTexture.width, game->gameOverTexture.height},
+            (Rectangle){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT},
+            (Vector2){0, 0},
+            0,
+            WHITE
+        );
+        DrawText(TextFormat("Score: %d", game->score), 360, 200, 24, WHITE);
+        DrawText(TextFormat("Recorde: %d", game->bestScore), 345, 250, 24, WHITE);
+        DrawText("R - Reiniciar", 335, 300, 24, WHITE);
+        DrawText("M - Voltar ao Menu", 290, 350, 24, WHITE);
         return;
     }
     
@@ -211,6 +219,7 @@ void liberar_jogo(Game *game) {
         UnloadTexture(game->fundoframes[i]);
     }
     UnloadTexture(game->menuTexture);
+    UnloadTexture(game->gameOverTexture);
     free(game);
 }
 

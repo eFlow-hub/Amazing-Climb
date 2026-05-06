@@ -25,6 +25,7 @@ typedef struct Game {
     float timerFundo;
     int totalFramesFundo;
     Texture2D menuTexture;
+    Texture2D gameOverTexture;
 } Game;
 
 Game *criar_jogo();

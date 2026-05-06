@@ -18,7 +18,19 @@ Game *criar_jogo() {
     game->bestScore = 0;
     game->screen = MENU;
     game->backgroundOffset = 0;
-
+    game->totalFramesFundo = 10;
+    game->fundoframes[0] = LoadTexture("assets/images/fundo/frame_00.png");
+    game->fundoframes[1] = LoadTexture("assets/images/fundo/frame_01.png");
+    game->fundoframes[2] = LoadTexture("assets/images/fundo/frame_02.png");
+    game->fundoframes[3] = LoadTexture("assets/images/fundo/frame_03.png");
+    game->fundoframes[4] = LoadTexture("assets/images/fundo/frame_04.png");
+    game->fundoframes[5] = LoadTexture("assets/images/fundo/frame_05.png");
+    game->fundoframes[6] = LoadTexture("assets/images/fundo/frame_06.png");
+    game->fundoframes[7] = LoadTexture("assets/images/fundo/frame_07.png");
+    game->fundoframes[8] = LoadTexture("assets/images/fundo/frame_08.png");
+    game->fundoframes[9] = LoadTexture("assets/images/fundo/frame_09.png");
+    game->frameAtualFundo = 0;
+    game->timerFundo = 0;
     carregar_texturas_obstaculos();
 
     return game;
@@ -88,6 +100,17 @@ void atualizar_jogo(Game *game, float delta) {
         return;
     }
 
+    game->timerFundo += delta;
+
+    if (game->timerFundo >= 0.1f) {
+        game ->frameAtualFundo++;
+        if (game->frameAtualFundo >= game->totalFramesFundo) {
+            game->frameAtualFundo = 0;
+        }
+        game->timerFundo = 0;
+    }
+
+
     game->backgroundOffset += 120 * delta;
 
     if (game->backgroundOffset >= 90){
@@ -128,10 +151,29 @@ void desenhar_jogo(Game *game) {
         DrawText("M - Voltar ao Menu", 270, 420, 24, BLACK);
         return;
     }
+    
+    Texture2D fundo = game->fundoframes[game->frameAtualFundo];
+    DrawTexturePro(
+        fundo,
+        (Rectangle){0, 0, fundo.width, fundo.height},
+        (Rectangle){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT},
+        (Vector2){0, 0},
+        0,
+        WHITE
+    );
+
+    DrawTexturePro(
+        fundo,
+        (Rectangle){0, 0, fundo.width, fundo.height},
+        (Rectangle){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT},
+        (Vector2){0, 0},
+        0,
+        WHITE
+    );
 
     DrawRectangle(BUILDING_X, 0, BUILDING_WIDTH, SCREEN_HEIGHT, DARKGRAY);
 
-    for (int y = -90 + game->backgroundOffset; y < SCREEN_HEIGHT; y += 90) {
+    for (int y = game->backgroundOffset - 90; y < SCREEN_HEIGHT; y += 90) {
         for (int lane = 0; lane < LANE_COUNT; lane++) {
             int x = BUILDING_X + lane * LANE_WIDTH + 30;
 
@@ -156,6 +198,9 @@ void liberar_jogo(Game *game) {
     descarregar_texturas_obstaculos();
     liberar_obstaculos(game->obstacles);
     liberar_player(game->player);
+    for (int i = 0; i < game->totalFramesFundo; i++) {
+        UnloadTexture(game->fundoframes[i]);
+    }
     free(game);
 }
 

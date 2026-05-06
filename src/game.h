@@ -20,6 +20,10 @@ typedef struct Game {
     int gameOver;
     float backgroundOffset;
     GameScreen screen;
+    Texture2D fundoframes[10];
+    int frameAtualFundo;
+    float timerFundo;
+    int totalFramesFundo;
 } Game;
 
 Game *criar_jogo();

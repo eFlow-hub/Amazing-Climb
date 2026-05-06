@@ -59,14 +59,12 @@ PIF_Game/
 # ⚙️ Compilação
 
 ### Windows (MSYS2 MINGW64)
-
-```bash
 make run
-Linux / Mac
+### Linux / Mac
 make
 ./jogo
-📁 Arquivos e Responsabilidades
-🧩 main.c
+# 📁 Arquivos e /Responsabilidades
+### 🧩 main.c
 Responsável por:
 
 Inicializar a janela (raylib)
@@ -83,7 +81,7 @@ while (!WindowShouldClose()) {
     atualizar_jogo();
     desenhar_jogo();
 }
-⚙️ config.h
+### ⚙️ config.h
 Armazena constantes globais:
 
 #define SCREEN_WIDTH 800
@@ -91,7 +89,7 @@ Armazena constantes globais:
 #define LANE_COUNT 3
 Evita números “hardcoded” no código.
 
-🧍 player.h / player.c
+### 🧍 player.h / player.c
 Struct Player:
 typedef struct Player {
     Rectangle rect;
@@ -99,6 +97,7 @@ typedef struct Player {
     int lane;
     float velocidade;
 } Player;
+
 Lógica:
 O player não se move livremente
 
@@ -107,13 +106,14 @@ Ele troca entre 3 faixas:
 0 = esquerda
 1 = centro
 2 = direita
+
 Funções:
-Função	Descrição
+Função          	Descrição
 criar_player	aloca e inicializa
 atualizar_player	troca de faixa
 desenhar_player	renderiza
 liberar_player	libera memória
-🧱 obstacle.h / obstacle.c
+### 🧱 obstacle.h / obstacle.c
 Struct Obstacle:
 typedef struct Obstacle {
     Rectangle rect;
@@ -150,7 +150,7 @@ Aumenta score
 liberar_obstaculos
 Libera toda a lista encadeada.
 
-🎮 game.h / game.c
+### 🎮 game.h / game.c
 Struct Game:
 typedef struct Game {
     Player *player;
@@ -162,13 +162,13 @@ typedef struct Game {
     int gameOver;
     GameScreen screen;
 } Game;
-📺 Estados do jogo
+### 📺 Estados do jogo
 typedef enum GameScreen {
     MENU,
     PLAYING,
     GAME_OVER
 } GameScreen;
-🔁 Funções principais
+### 🔁 Funções principais
 criar_jogo
 Inicializa:
 
@@ -222,28 +222,15 @@ PLAYING → jogo
 
 GAME OVER → score + opções
 
-🧠 Conceitos aplicados
-📌 Ponteiros
-Player *player;
-Obstacle *lista;
-📌 Alocação dinâmica
-malloc()
-free()
-📌 Lista encadeada
-struct Obstacle *next;
-📌 Modularização
-Separação em:
+# 🧠 Conceitos aplicados
 
-player
+- 📌 Ponteiro
+- 📌 Alocação dinâmica
+- 📌 Lista encadeada
+- 📌 Modularização
+- 📌 Estrutura de dados dinâmica
 
-obstacle
-
-game
-
-📌 Estrutura de dados dinâmica
-Lista cresce e diminui durante execução.
-
-🎯 Mecânicas principais
+# 🎯 Mecânicas principais
 Movimento por faixas
 
 Spawn controlado de obstáculos
@@ -258,20 +245,8 @@ Sistema de pontuação
 
 Menu + Game Over
 
-🚀 Possíveis melhorias futuras
-Sprites do Homem-Aranha
 
-Animações
-
-Sons
-
-Dificuldade progressiva
-
-Power-ups
-
-Persistência de recorde em arquivo
-
-👨‍💻 Autor
+# 👨‍💻 Autor
 Projeto acadêmico desenvolvido para prática de:
 
 Estruturas de dados
@@ -299,9 +274,10 @@ Se quiser, próximo passo a gente pode:
 possiveis proximas atts:
 
 1. Adicionar som de colisão
-2. Colocar sprites nos obstáculos
+2. ~~Colocar sprites nos obstáculos~~
 3. Criar tela de vitória ou objetivo final
 4. Salvar recorde em arquivo
 5. Melhorar menu visual
 6. Adicionar dificuldade progressiva leve
 7. Adicionar efeito de tela tremendo ao bater
+8. Mudar cor do recorde e da vida do jogador

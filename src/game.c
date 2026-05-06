@@ -8,7 +8,7 @@ Game *criar_jogo() {
     if (game == NULL) {
         return NULL;
     }
-
+    game->menuTexture = LoadTexture("assets/images/menu.png");
     game->player = criar_player();
     game->obstacles = NULL;
     game->timerSpawn = 0;
@@ -136,10 +136,18 @@ void atualizar_jogo(Game *game, float delta) {
 
 void desenhar_jogo(Game *game) {
     if (game->screen == MENU) {
+        DrawTexturePro(
+        game->menuTexture,
+        (Rectangle){0, 0, game->menuTexture.width, game->menuTexture.height},
+        (Rectangle){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT},
+        (Vector2){0, 0},
+        0,
+        WHITE
+    );
         DrawText("HOMEM-ARANHA NO PREDIO", 190, 150, 30, RED);
-        DrawText("ENTER - Iniciar", 300, 250, 24, BLACK);
-        DrawText(TextFormat("Recorde: %d", game->bestScore), 315, 300, 24, BLACK);
-        DrawText("ESC - Sair", 330, 350, 24, BLACK);
+        DrawText("ENTER - Iniciar", 300, 250, 24, WHITE);
+        DrawText(TextFormat("Recorde: %d", game->bestScore), 315, 300, 24, WHITE);
+        DrawText("ESC - Sair", 330, 350, 24, WHITE);
         return;
     }
 
@@ -151,6 +159,7 @@ void desenhar_jogo(Game *game) {
         DrawText("M - Voltar ao Menu", 270, 420, 24, BLACK);
         return;
     }
+    
     
     Texture2D fundo = game->fundoframes[game->frameAtualFundo];
     DrawTexturePro(
@@ -201,6 +210,7 @@ void liberar_jogo(Game *game) {
     for (int i = 0; i < game->totalFramesFundo; i++) {
         UnloadTexture(game->fundoframes[i]);
     }
+    UnloadTexture(game->menuTexture);
     free(game);
 }
 

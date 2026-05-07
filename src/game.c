@@ -145,7 +145,6 @@ void desenhar_jogo(Game *game) {
         0,
         WHITE
     );
-        DrawText("AMAZING CLIMB", 270, 150, 30, RED);
         DrawText("ENTER - Iniciar", 300, 250, 24, WHITE);
         DrawText(TextFormat("Recorde: %d", game->bestScore), 320, 300, 24, WHITE);
         DrawText("ESC - Sair", 330, 350, 24, WHITE);

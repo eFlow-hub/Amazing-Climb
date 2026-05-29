@@ -62,8 +62,7 @@ PIF_Game/
 
 ## Ideias futuras
 
-- Salvar o recorde em arquivo
+
 - Adicionar som de colisão
 - Aumentar a dificuldade aos poucos
 - Melhorar a tela de menu
-- Adicionar efeito visual ao bater

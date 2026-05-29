@@ -1,119 +1,117 @@
 #include "obstacle.h"
 #include "config.h"
 #include <stdlib.h>
-static Texture2D obstaculoTexturas[3];
 
-void carregar_texturas_obstaculos() {
-    obstaculoTexturas[0] = LoadTexture("assets/images/obstaculo1.png");
-    obstaculoTexturas[1] = LoadTexture("assets/images/obstaculo2.png");
-    obstaculoTexturas[2] = LoadTexture("assets/images/obstaculo3.png");
+static Texture2D texturas_obstaculos[QTD_TEXTURAS_OBSTACULOS];
+
+static float posicao_x_obstaculo(int faixa){
+    return PREDIO_X + faixa * LARGURA_FAIXA + LARGURA_FAIXA / 2 - LARGURA_OBSTACULO / 2;
 }
 
-void descarregar_texturas_obstaculos() {
-    for (int i = 0; i < 3; i++) {
-        UnloadTexture(obstaculoTexturas[i]);
+void carregar_texturas_obstaculos(void){
+    for(int i = 0; i < QTD_TEXTURAS_OBSTACULOS; i++){
+        texturas_obstaculos[i] = LoadTexture(TextFormat("assets/images/obstaculo%d.png", i + 1));
     }
 }
 
-void adicionar_obstaculo(Obstacle **lista) {
-    int quantidade = GetRandomValue(1, 2); 
-    int faixaBloqueada1 = GetRandomValue(0, LANE_COUNT - 1);
-    int faixaBloqueada2 = faixaBloqueada1;
+void descarregar_texturas_obstaculos(void){
+    for(int i = 0; i < QTD_TEXTURAS_OBSTACULOS; i++){
+        UnloadTexture(texturas_obstaculos[i]);
+    }
+}
 
-    if (quantidade == 2) {
-        do {
-            faixaBloqueada2 = GetRandomValue(0, LANE_COUNT - 1);
-        } while (faixaBloqueada2 == faixaBloqueada1);
+void adicionar_obstaculo(Obstaculo **lista){
+    int quantidade = GetRandomValue(MIN_OBSTACULOS_SPAWN, MAX_OBSTACULOS_SPAWN);
+    int faixa_1 = GetRandomValue(0, QTD_FAIXAS - 1);
+    int faixa_2 = faixa_1;
+
+    if(quantidade == 2){
+        do{
+            faixa_2 = GetRandomValue(0, QTD_FAIXAS - 1);
+        }while(faixa_2 == faixa_1);
     }
 
-    for (int i = 0; i < quantidade; i++) {
-        int lane;
+    int faixas[2] = {faixa_1, faixa_2};
 
-        if (i == 0) {
-            lane = faixaBloqueada1;
-        } else {
-            lane = faixaBloqueada2;
-        }
+    for(int i = 0; i < quantidade; i++){
+        int faixa = faixas[i];
+        Obstaculo *novo = malloc(sizeof *novo);
 
-        Obstacle *novo = malloc(sizeof(Obstacle));
-
-        if (novo == NULL) {
+        if(novo == NULL){
             return;
         }
 
-        novo->rect.width = OBSTACLE_WIDTH;
-        novo->rect.height = OBSTACLE_HEIGHT;
-
-        novo->rect.x = BUILDING_X + lane * LANE_WIDTH + LANE_WIDTH / 2 - OBSTACLE_WIDTH / 2;
-        novo->rect.y = -OBSTACLE_HEIGHT;
-
-        novo->velocidade = OBSTACLE_SPEED;
-
-        novo->tipo = GetRandomValue(0, 2);
-
-        novo->next = *lista;
+        novo->retangulo = (Rectangle){
+            posicao_x_obstaculo(faixa),
+            -ALTURA_OBSTACULO,
+            LARGURA_OBSTACULO,
+            ALTURA_OBSTACULO
+        };
+        novo->velocidade = VELOCIDADE_OBSTACULO;
+        novo->tipo = GetRandomValue(0, QTD_TEXTURAS_OBSTACULOS - 1);
+        novo->proximo = *lista;
         *lista = novo;
     }
 }
 
-void atualizar_obstaculos(Obstacle *lista, float delta) {
-    Obstacle *atual = lista;
+void atualizar_obstaculos(Obstaculo *lista, float delta){
+    Obstaculo *atual = lista;
 
-    while (atual != NULL) {
-        atual->rect.y += atual->velocidade * delta;
-        atual = atual->next;
+    while(atual != NULL){
+        atual->retangulo.y += atual->velocidade * delta;
+        atual = atual->proximo;
     }
 }
 
-void desenhar_obstaculos(Obstacle *lista) {
-    Obstacle *atual = lista;
+void desenhar_obstaculos(Obstaculo *lista){
+    Obstaculo *atual = lista;
 
-    while (atual != NULL) {
-        Texture2D textura = obstaculoTexturas[atual->tipo];
+    while(atual != NULL){
+        Texture2D textura = texturas_obstaculos[atual->tipo];
 
         DrawTexturePro(
             textura,
-            (Rectangle){0, 0, textura.width, textura.height},
-            atual->rect,
+            (Rectangle){0, 0, (float)textura.width, (float)textura.height},
+            atual->retangulo,
             (Vector2){0, 0},
             0,
             WHITE
         );
 
-        atual = atual->next;
+        atual = atual->proximo;
     }
 }
 
-void remover_obstaculos_fora_da_tela(Obstacle **lista, int *score) {
-    Obstacle *atual = *lista;
-    Obstacle *anterior = NULL;
+void remover_obstaculos_fora_da_tela(Obstaculo **lista, int *pontuacao){
+    Obstaculo *atual = *lista;
+    Obstaculo *anterior = NULL;
 
-    while (atual != NULL) {
-        if (atual->rect.y > SCREEN_HEIGHT) {
-            Obstacle *remover = atual;
+    while(atual != NULL){
+        if(atual->retangulo.y > ALTURA_TELA){
+            Obstaculo *remover = atual;
 
-            if (anterior == NULL) {
-                *lista = atual->next;
+            if(anterior == NULL){
+                *lista = atual->proximo;
                 atual = *lista;
-            } else {
-                anterior->next = atual->next;
-                atual = atual->next;
+            }else{
+                anterior->proximo = atual->proximo;
+                atual = atual->proximo;
             }
 
             free(remover);
-            (*score)++;
-        } else {
+            (*pontuacao)++;
+        }else{
             anterior = atual;
-            atual = atual->next;
+            atual = atual->proximo;
         }
     }
 }
 
-void liberar_obstaculos(Obstacle *lista) {
-    Obstacle *atual = lista;
+void liberar_obstaculos(Obstaculo *lista){
+    Obstaculo *atual = lista;
 
-    while (atual != NULL) {
-        Obstacle *proximo = atual->next;
+    while(atual != NULL){
+        Obstaculo *proximo = atual->proximo;
         free(atual);
         atual = proximo;
     }

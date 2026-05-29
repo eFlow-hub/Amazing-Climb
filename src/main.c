@@ -1,36 +1,39 @@
-#include "raylib.h" 
+#include "raylib.h"
 #include "config.h"
 #include "game.h"
 #include <stdlib.h>
 #include <time.h>
 
-int main() {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE);
+int main(void){
+    InitWindow(LARGURA_TELA, ALTURA_TELA, TITULO_JOGO);
     SetTargetFPS(60);
+    InitAudioDevice();
 
     srand(time(NULL));
 
-    InitAudioDevice();
+    Jogo *jogo = criar_jogo();
 
-    Game *game = criar_jogo();
+    if(jogo == NULL){
+        CloseAudioDevice();
+        CloseWindow();
+        return 1;
+    }
 
-    while (!WindowShouldClose()) {
+    while(!WindowShouldClose()){
         float delta = GetFrameTime();
 
-        atualizar_jogo(game, delta);
+        atualizar_jogo(jogo, delta);
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        desenhar_jogo(game);
+        desenhar_jogo(jogo);
 
         EndDrawing();
     }
 
-    liberar_jogo(game);
-
+    liberar_jogo(jogo);
     CloseAudioDevice();
-
     CloseWindow();
 
     return 0;

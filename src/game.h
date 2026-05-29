@@ -1,39 +1,38 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "config.h"
 #include "player.h"
 #include "obstacle.h"
 
-typedef enum GameScreen {
+typedef enum TelaJogo{
     MENU,
-    PLAYING,
-    GAME_OVER
-} GameScreen;
+    JOGANDO,
+    FIM_DE_JOGO
+} TelaJogo;
 
-typedef struct Game {
-    Player *player;
-    Obstacle *obstacles;
-    float timerSpawn;
+typedef struct Jogo{
+    Jogador *jogador;
+    Obstaculo *obstaculos;
+    float tempo_spawn;
     float invencibilidade;
-    int score;
-    int bestScore;
-    int gameOver;
-    float backgroundOffset;
-    GameScreen screen;
-    Texture2D fundoframes[10];
-    int frameAtualFundo;
-    float timerFundo;
-    int totalFramesFundo;
-    Texture2D menuTexture;
-    Texture2D gameOverTexture;
-    Texture2D windowTexture;
-    Music soundtrack;
-} Game;
+    int pontuacao;
+    int recorde;
+    float deslocamento_fundo;
+    TelaJogo tela;
+    Texture2D frames_fundo[TOTAL_FRAMES_FUNDO];
+    int frame_fundo;
+    float tempo_fundo;
+    Texture2D textura_menu;
+    Texture2D textura_fim_de_jogo;
+    Texture2D textura_janela;
+    Music musica;
+} Jogo;
 
-Game *criar_jogo();
-void atualizar_jogo(Game *game, float delta);
-void desenhar_jogo(Game *game);
-void liberar_jogo(Game *game);
-void reiniciar_partida(Game *game);
+Jogo *criar_jogo(void);
+void atualizar_jogo(Jogo *jogo, float delta);
+void desenhar_jogo(Jogo *jogo);
+void liberar_jogo(Jogo *jogo);
+void reiniciar_partida(Jogo *jogo);
 
 #endif

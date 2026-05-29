@@ -1,283 +1,69 @@
-# 🕷️ Amazing Climb
+# Amazing Climb
 
-Projeto desenvolvido em linguagem C utilizando a biblioteca **raylib**, com foco em aplicar conceitos fundamentais como:
+Jogo simples feito em C com raylib. O jogador controla o Homem-Aranha subindo um prédio enquanto desvia de obstáculos que caem pelas faixas.
 
-- Structs
-- Ponteiros
-- Alocação dinâmica (`malloc` / `free`)
-- Lista encadeada
-- Organização modular em múltiplos arquivos
+O projeto foi organizado para praticar estruturas, ponteiros, alocação dinâmica, lista encadeada e separação de código em módulos.
 
----
+## Como jogar
 
-# 🎮 Descrição do Jogo
+- `ENTER`: iniciar a partida
+- `A` ou seta esquerda: mover para a faixa da esquerda
+- `D` ou seta direita: mover para a faixa da direita
+- `R`: reiniciar depois do fim de jogo
+- `M`: voltar ao menu depois do fim de jogo
+- `ESC`: sair pelo menu
 
-O jogador controla o Homem-Aranha subindo um prédio.
+O prédio tem três faixas. Os obstáculos aparecem em uma ou duas faixas por vez, deixando sempre pelo menos uma passagem livre. Cada obstáculo evitado soma ponto. Ao bater, o jogador perde uma vida e fica invencível por um curto período.
 
-- O prédio possui **3 faixas (lanes)**: esquerda, centro e direita.
-- O player só pode se mover entre essas faixas.
-- Obstáculos caem de cima do prédio.
-- O jogador deve desviar para sobreviver.
-- Se colidir:
-  - perde uma vida
-  - obstáculo desaparece
-- Se um obstáculo sai da tela:
-  - jogador ganha ponto
-- O jogo termina quando as vidas chegam a 0.
+## Compilação
 
----
+No Windows com MSYS2/MINGW64:
 
-# 🧠 Lógica Geral
+```sh
+make run
+```
 
-Fluxo principal:
-main → cria jogo
-→ loop principal
-→ atualizar_jogo()
-→ desenhar_jogo()
-→ liberar_jogo()
+No Linux ou macOS:
 
+```sh
+make
+./jogo
+```
 
----
+## Estrutura
 
-# 🗂️ Estrutura de Pastas
+```text
 PIF_Game/
 ├── Makefile
 ├── README.md
+├── assets/
 └── src/
-├── main.c
-├── config.h
-├── game.c
-├── game.h
-├── player.c
-├── player.h
-├── obstacle.c
-└── obstacle.h
+    ├── config.h
+    ├── game.c
+    ├── game.h
+    ├── main.c
+    ├── obstacle.c
+    ├── obstacle.h
+    ├── player.c
+    └── player.h
+```
 
+## Arquivos principais
 
----
+`main.c` inicializa a janela, o áudio, cria o jogo e mantém o loop principal.
 
-# ⚙️ Compilação
+`config.h` concentra as constantes usadas pelo jogo: tamanho da tela, dimensões dos sprites, velocidade dos obstáculos, intervalos de animação e medidas do prédio.
 
-### Windows (MSYS2 MINGW64)
-make run
-### Linux / Mac
-make
-./jogo
-# 📁 Arquivos e /Responsabilidades
-### 🧩 main.c
-Responsável por:
+`player.c` guarda a lógica do jogador: criação, troca de faixa, animação, desenho e liberação das texturas.
 
-Inicializar a janela (raylib)
+`obstacle.c` trabalha com uma lista encadeada de obstáculos. Ele cria novos obstáculos, atualiza a posição, desenha, remove os que saíram da tela e libera a memória no fim.
 
-Criar o jogo
+`game.c` coordena os estados do jogo, colisões, pontuação, recorde, menu, fim de jogo, música e desenho geral da cena.
 
-Rodar o loop principal
+## Ideias futuras
 
-Chamar atualização e renderização
-
-Liberar memória
-
-while (!WindowShouldClose()) {
-    atualizar_jogo();
-    desenhar_jogo();
-}
-### ⚙️ config.h
-Armazena constantes globais:
-
-#define SCREEN_WIDTH 800
-#define BUILDING_WIDTH 300
-#define LANE_COUNT 3
-Evita números “hardcoded” no código.
-
-### 🧍 player.h / player.c
-Struct Player:
-typedef struct Player {
-    Rectangle rect;
-    int vidas;
-    int lane;
-    float velocidade;
-} Player;
-
-Lógica:
-O player não se move livremente
-
-Ele troca entre 3 faixas:
-
-0 = esquerda
-1 = centro
-2 = direita
-
-Funções:
-Função          	Descrição
-criar_player	aloca e inicializa
-atualizar_player	troca de faixa
-desenhar_player	renderiza
-liberar_player	libera memória
-### 🧱 obstacle.h / obstacle.c
-Struct Obstacle:
-typedef struct Obstacle {
-    Rectangle rect;
-    float velocidade;
-    struct Obstacle *next;
-} Obstacle;
-👉 Isso cria uma lista encadeada
-
-🧠 Lista Encadeada
-Estrutura:
-
-[Obstacle] → [Obstacle] → [Obstacle] → NULL
-Cada obstáculo aponta para o próximo.
-
-Funções:
-adicionar_obstaculo
-Cria 1 ou 2 obstáculos
-
-Escolhe faixas aleatórias
-
-Nunca bloqueia as 3 faixas
-
-atualizar_obstaculos
-y += velocidade * delta
-Faz todos descerem.
-
-remover_obstaculos_fora_da_tela
-Remove obstáculos fora da tela
-
-Libera memória (free)
-
-Aumenta score
-
-liberar_obstaculos
-Libera toda a lista encadeada.
-
-### 🎮 game.h / game.c
-Struct Game:
-typedef struct Game {
-    Player *player;
-    Obstacle *obstacles;
-    float timerSpawn;
-    float invencibilidade;
-    int score;
-    int bestScore;
-    int gameOver;
-    GameScreen screen;
-} Game;
-### 📺 Estados do jogo
-typedef enum GameScreen {
-    MENU,
-    PLAYING,
-    GAME_OVER
-} GameScreen;
-### 🔁 Funções principais
-criar_jogo
-Inicializa:
-
-player
-
-lista vazia
-
-score
-
-estado MENU
-
-atualizar_jogo
-Responsável por toda a lógica:
-
-MENU → espera clique
-PLAYING →
-    spawn obstáculos
-    mover player
-    mover obstáculos
-    remover obstáculos
-    verificar colisões
-GAME_OVER → espera input
-verificar_colisoes
-Percorre lista:
-
-if (colisão) {
-    perde vida
-    ativa invencibilidade
-    remove obstáculo
-    free()
-}
-👉 Aqui está o uso forte de:
-
-ponteiros
-
-lista encadeada
-
-manipulação de memória
-
-reiniciar_partida
-libera memória
-cria novo player
-zera score
-reseta estado
-desenhar_jogo
-Desenha baseado no estado:
-
-MENU → botões
-
-PLAYING → jogo
-
-GAME OVER → score + opções
-
-# 🧠 Conceitos aplicados
-
-- 📌 Ponteiro
-- 📌 Alocação dinâmica
-- 📌 Lista encadeada
-- 📌 Modularização
-- 📌 Estrutura de dados dinâmica
-
-# 🎯 Mecânicas principais
-Movimento por faixas
-
-Spawn controlado de obstáculos
-
-Sempre existe caminho livre
-
-Sistema de vidas
-
-Invencibilidade temporária
-
-Sistema de pontuação
-
-Menu + Game Over
-
-
-# 👨‍💻 Autor
-Projeto acadêmico desenvolvido para prática de:
-
-Estruturas de dados
-
-Programação em C
-
-Desenvolvimento de jogos básicos
-
-
----
-
-Se quiser, próximo passo a gente pode:
-
-👉 salvar o recorde em arquivo (pra não perder ao fechar o jogo)  
-👉 deixar o menu mais bonito (UI melhor)  
-👉 adicionar sprite real do Homem-Aranha 🕷️
-
-
-
-
-
-
-
-
-possiveis proximas atts:
-
-1. Adicionar som de colisão
-2. ~~Colocar sprites nos obstáculos~~
-3. Criar tela de vitória ou objetivo final
-4. Salvar recorde em arquivo
-5. Melhorar menu visual
-6. Adicionar dificuldade progressiva leve
-7. Adicionar efeito de tela tremendo ao bater
-8. Mudar cor do recorde e da vida do jogador
+- Salvar o recorde em arquivo
+- Adicionar som de colisão
+- Aumentar a dificuldade aos poucos
+- Melhorar a tela de menu
+- Adicionar efeito visual ao bater

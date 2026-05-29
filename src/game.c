@@ -1,71 +1,93 @@
 #include "game.h"
 #include "config.h"
+#include <stdio.h>
 #include <stdlib.h>
 
-Game *criar_jogo() {
-    Game *game = malloc(sizeof(Game));
+static void carregar_frames_fundo(Jogo *jogo){
+    char caminho[64];
 
-    if (game == NULL) {
-        return NULL;
+    for(int i = 0; i < TOTAL_FRAMES_FUNDO; i++){
+        snprintf(caminho, sizeof caminho, "assets/images/fundo/frame_%02d.png", i);
+        jogo->frames_fundo[i] = LoadTexture(caminho);
     }
-    game->menuTexture = LoadTexture("assets/images/menu.png");
-    game->player = criar_player();
-    game->obstacles = NULL;
-    game->timerSpawn = 0;
-    game->gameOver = 0;
-    game->invencibilidade = 0;
-    game->score = 0;
-    game->bestScore = 0;
-    game->screen = MENU;
-    game->backgroundOffset = 0;
-    game->totalFramesFundo = 10;
-    game->fundoframes[0] = LoadTexture("assets/images/fundo/frame_00.png");
-    game->fundoframes[1] = LoadTexture("assets/images/fundo/frame_01.png");
-    game->fundoframes[2] = LoadTexture("assets/images/fundo/frame_02.png");
-    game->fundoframes[3] = LoadTexture("assets/images/fundo/frame_03.png");
-    game->fundoframes[4] = LoadTexture("assets/images/fundo/frame_04.png");
-    game->fundoframes[5] = LoadTexture("assets/images/fundo/frame_05.png");
-    game->fundoframes[6] = LoadTexture("assets/images/fundo/frame_06.png");
-    game->fundoframes[7] = LoadTexture("assets/images/fundo/frame_07.png");
-    game->fundoframes[8] = LoadTexture("assets/images/fundo/frame_08.png");
-    game->fundoframes[9] = LoadTexture("assets/images/fundo/frame_09.png");
-    game->frameAtualFundo = 0;
-    game->timerFundo = 0;
-    game->gameOverTexture = LoadTexture("assets/images/gameover.png");
-    game->windowTexture = LoadTexture("assets/images/windows.png");
-    game->soundtrack = LoadMusicStream("assets/soundtrack.mp3");
-    game->soundtrack.looping = true;
-    PlayMusicStream(game->soundtrack);
-    carregar_texturas_obstaculos();
-
-    return game;
 }
 
-void verificar_colisoes(Game *game) {
-    if (game->invencibilidade > 0) {
+static void descarregar_frames_fundo(Jogo *jogo){
+    for(int i = 0; i < TOTAL_FRAMES_FUNDO; i++){
+        UnloadTexture(jogo->frames_fundo[i]);
+    }
+}
+
+static void desenhar_textura_tela(Texture2D textura){
+    DrawTexturePro(
+        textura,
+        (Rectangle){0, 0, (float)textura.width, (float)textura.height},
+        (Rectangle){0, 0, LARGURA_TELA, ALTURA_TELA},
+        (Vector2){0, 0},
+        0,
+        WHITE
+    );
+}
+
+static int tipo_janela(int faixa, int linha){
+    return (faixa * 7 + linha * 3) % QTD_TIPOS_JANELA;
+}
+
+static void desenhar_janelas(Jogo *jogo){
+    static const Rectangle fontes[QTD_TIPOS_JANELA] = {
+        {0, 0, TAMANHO_SPRITE_JANELA, TAMANHO_SPRITE_JANELA},
+        {TAMANHO_SPRITE_JANELA, 0, TAMANHO_SPRITE_JANELA, TAMANHO_SPRITE_JANELA},
+        {0, TAMANHO_SPRITE_JANELA, TAMANHO_SPRITE_JANELA, TAMANHO_SPRITE_JANELA},
+        {TAMANHO_SPRITE_JANELA, TAMANHO_SPRITE_JANELA, TAMANHO_SPRITE_JANELA, TAMANHO_SPRITE_JANELA}
+    };
+    const float tamanho = TAMANHO_JANELA;
+    int linha = 0;
+
+    for(float y = jogo->deslocamento_fundo - ESPACO_JANELAS; y < ALTURA_TELA; y += ESPACO_JANELAS){
+        for(int faixa = 0; faixa < QTD_FAIXAS; faixa++){
+            int tipo = tipo_janela(faixa, linha);
+            float x = PREDIO_X + faixa * LARGURA_FAIXA + LARGURA_FAIXA / 2 - tamanho / 2;
+
+            DrawTexturePro(
+                jogo->textura_janela,
+                fontes[tipo],
+                (Rectangle){x, y, tamanho, tamanho},
+                (Vector2){0, 0},
+                0,
+                WHITE
+            );
+        }
+
+        linha++;
+    }
+}
+
+static void verificar_colisoes(Jogo *jogo){
+    if(jogo->invencibilidade > 0){
         return;
     }
-    Obstacle *atual = game->obstacles;
-    Obstacle *anterior = NULL;
 
-    while (atual != NULL) {
-        if (CheckCollisionRecs(game->player->rect, atual->rect)) {
-            game->player->vidas--;
-            game->invencibilidade = 1.0f;
+    Obstaculo *atual = jogo->obstaculos;
+    Obstaculo *anterior = NULL;
 
-            if (anterior == NULL) {
-                game->obstacles = atual->next;
-            } else {
-                anterior->next = atual->next;
+    while(atual != NULL){
+        if(CheckCollisionRecs(jogo->jogador->retangulo, atual->retangulo)){
+            jogo->jogador->vidas--;
+            jogo->invencibilidade = TEMPO_INVENCIBILIDADE;
+
+            if(anterior == NULL){
+                jogo->obstaculos = atual->proximo;
+            }else{
+                anterior->proximo = atual->proximo;
             }
 
             free(atual);
 
-            if (game->player->vidas <= 0) {
-                game->gameOver = 1;
-                game->screen = GAME_OVER;
-                if (game->score > game->bestScore) {
-                    game->bestScore = game->score;
+            if(jogo->jogador->vidas <= 0){
+                jogo->tela = FIM_DE_JOGO;
+
+                if(jogo->pontuacao > jogo->recorde){
+                    jogo->recorde = jogo->pontuacao;
                 }
             }
 
@@ -73,195 +95,180 @@ void verificar_colisoes(Game *game) {
         }
 
         anterior = atual;
-        atual = atual->next;
+        atual = atual->proximo;
     }
 }
 
-void atualizar_jogo(Game *game, float delta) {
-    UpdateMusicStream(game->soundtrack);
-    if (game->screen == GAME_OVER) {
-        if (IsKeyPressed(KEY_R)) {
-            reiniciar_partida(game);
+Jogo *criar_jogo(void){
+    Jogo *jogo = malloc(sizeof *jogo);
+
+    if(jogo == NULL){
+        return NULL;
+    }
+
+    jogo->jogador = criar_jogador();
+
+    if(jogo->jogador == NULL){
+        free(jogo);
+        return NULL;
+    }
+
+    jogo->obstaculos = NULL;
+    jogo->tempo_spawn = 0;
+    jogo->invencibilidade = 0;
+    jogo->pontuacao = 0;
+    jogo->recorde = 0;
+    jogo->deslocamento_fundo = 0;
+    jogo->tela = MENU;
+    jogo->frame_fundo = 0;
+    jogo->tempo_fundo = 0;
+
+    carregar_frames_fundo(jogo);
+    jogo->textura_menu = LoadTexture("assets/images/menu.png");
+    jogo->textura_fim_de_jogo = LoadTexture("assets/images/gameover.png");
+    jogo->textura_janela = LoadTexture("assets/images/windows.png");
+    jogo->musica = LoadMusicStream("assets/soundtrack.mp3");
+    jogo->musica.looping = true;
+
+    carregar_texturas_obstaculos();
+    PlayMusicStream(jogo->musica);
+
+    return jogo;
+}
+
+void atualizar_jogo(Jogo *jogo, float delta){
+    UpdateMusicStream(jogo->musica);
+
+    if(jogo->tela == FIM_DE_JOGO){
+        if(IsKeyPressed(KEY_R)){
+            reiniciar_partida(jogo);
         }
 
-        if (IsKeyPressed(KEY_M)) {
-            game->screen = MENU;
+        if(IsKeyPressed(KEY_M)){
+            jogo->tela = MENU;
         }
 
         return;
     }
 
-    if (game->screen == MENU) {
-        if (IsKeyPressed(KEY_ENTER)) {
-            reiniciar_partida(game);
+    if(jogo->tela == MENU){
+        if(IsKeyPressed(KEY_ENTER)){
+            reiniciar_partida(jogo);
         }
-        if (IsKeyPressed(KEY_ESCAPE)) {
+
+        if(IsKeyPressed(KEY_ESCAPE)){
             CloseWindow();
         }
 
         return;
     }
 
-    if (game->gameOver) {
-        return;
-    }
+    jogo->tempo_fundo += delta;
 
-    game->timerFundo += delta;
+    if(jogo->tempo_fundo >= TEMPO_FRAME_FUNDO){
+        jogo->frame_fundo++;
 
-    if (game->timerFundo >= 0.1f) {
-        game ->frameAtualFundo++;
-        if (game->frameAtualFundo >= game->totalFramesFundo) {
-            game->frameAtualFundo = 0;
+        if(jogo->frame_fundo >= TOTAL_FRAMES_FUNDO){
+            jogo->frame_fundo = 0;
         }
-        game->timerFundo = 0;
+
+        jogo->tempo_fundo = 0;
     }
 
+    jogo->deslocamento_fundo += VELOCIDADE_FUNDO * delta;
 
-    game->backgroundOffset += 120 * delta;
-
-    if (game->backgroundOffset >= 90){
-        game->backgroundOffset = 0;
+    if(jogo->deslocamento_fundo >= ESPACO_JANELAS){
+        jogo->deslocamento_fundo = 0;
     }
 
-    if (game->invencibilidade > 0) {
-        game->invencibilidade -= delta;
+    if(jogo->invencibilidade > 0){
+        jogo->invencibilidade -= delta;
+
+        if(jogo->invencibilidade < 0){
+            jogo->invencibilidade = 0;
+        }
     }
 
-    game->timerSpawn += delta;
+    jogo->tempo_spawn += delta;
 
-    if (game->timerSpawn >= 1.0f) {
-        adicionar_obstaculo(&game->obstacles);
-        game->timerSpawn = 0;
+    if(jogo->tempo_spawn >= INTERVALO_SPAWN){
+        adicionar_obstaculo(&jogo->obstaculos);
+        jogo->tempo_spawn = 0;
     }
 
-    atualizar_player(game->player, delta);
-    atualizar_obstaculos(game->obstacles, delta);
-    remover_obstaculos_fora_da_tela(&game->obstacles, &game->score);
-    verificar_colisoes(game);
+    atualizar_jogador(jogo->jogador, delta);
+    atualizar_obstaculos(jogo->obstaculos, delta);
+    remover_obstaculos_fora_da_tela(&jogo->obstaculos, &jogo->pontuacao);
+    verificar_colisoes(jogo);
 }
 
-void desenhar_jogo(Game *game) {
-    if (game->screen == MENU) {
-        DrawTexturePro(
-        game->menuTexture,
-        (Rectangle){0, 0, game->menuTexture.width, game->menuTexture.height},
-        (Rectangle){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT},
-        (Vector2){0, 0},
-        0,
-        WHITE
-    );
+void desenhar_jogo(Jogo *jogo){
+    if(jogo->tela == MENU){
+        desenhar_textura_tela(jogo->textura_menu);
         DrawText("ENTER - Iniciar", 300, 250, 24, WHITE);
-        DrawText(TextFormat("Recorde: %d", game->bestScore), 320, 300, 24, WHITE);
+        DrawText(TextFormat("Recorde: %d", jogo->recorde), 320, 300, 24, WHITE);
         DrawText("ESC - Sair", 330, 350, 24, WHITE);
         return;
     }
 
-    if (game->screen == GAME_OVER) {
-        DrawTexturePro(
-            game->gameOverTexture,
-            (Rectangle){0, 0, game->gameOverTexture.width, game->gameOverTexture.height},
-            (Rectangle){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT},
-            (Vector2){0, 0},
-            0,
-            WHITE
-        );
-        DrawText(TextFormat("Score: %d", game->score), 360, 200, 24, WHITE);
-        DrawText(TextFormat("Recorde: %d", game->bestScore), 345, 250, 24, WHITE);
+    if(jogo->tela == FIM_DE_JOGO){
+        desenhar_textura_tela(jogo->textura_fim_de_jogo);
+        DrawText(TextFormat("Pontuacao: %d", jogo->pontuacao), 330, 200, 24, WHITE);
+        DrawText(TextFormat("Recorde: %d", jogo->recorde), 345, 250, 24, WHITE);
         DrawText("R - Reiniciar", 335, 300, 24, WHITE);
         DrawText("M - Voltar ao Menu", 290, 350, 24, WHITE);
         return;
     }
-    
-    
-    Texture2D fundo = game->fundoframes[game->frameAtualFundo];
-    DrawTexturePro(
-        fundo,
-        (Rectangle){0, 0, fundo.width, fundo.height},
-        (Rectangle){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT},
-        (Vector2){0, 0},
-        0,
-        WHITE
-    );
 
-    DrawTexturePro(
-        fundo,
-        (Rectangle){0, 0, fundo.width, fundo.height},
-        (Rectangle){0, 0, SCREEN_WIDTH, SCREEN_HEIGHT},
-        (Vector2){0, 0},
-        0,
-        WHITE
-    );
+    Texture2D fundo = jogo->frames_fundo[jogo->frame_fundo];
 
-    DrawRectangle(BUILDING_X, 0, BUILDING_WIDTH, SCREEN_HEIGHT, DARKGRAY);
+    desenhar_textura_tela(fundo);
+    DrawRectangle(PREDIO_X, 0, LARGURA_PREDIO, ALTURA_TELA, DARKGRAY);
+    desenhar_janelas(jogo);
 
-    for (int y = game->backgroundOffset - 90; y < SCREEN_HEIGHT; y += 90) {
-        for (int lane = 0; lane < LANE_COUNT; lane++) {
-            int x = BUILDING_X + lane * LANE_WIDTH + 30;
+    DrawLine(PREDIO_X + LARGURA_FAIXA, 0, PREDIO_X + LARGURA_FAIXA, ALTURA_TELA, GRAY);
+    DrawLine(PREDIO_X + LARGURA_FAIXA * 2, 0, PREDIO_X + LARGURA_FAIXA * 2, ALTURA_TELA, GRAY);
 
-            Rectangle fontes[4] = {
-                {0, 0, 208, 208},
-                {208, 0, 208, 208},
-                {0, 208, 208, 208},
-                {208, 208, 208, 208}
-            };
+    desenhar_jogador(jogo->jogador, jogo->invencibilidade);
+    desenhar_obstaculos(jogo->obstaculos);
 
-            for (int y = game->backgroundOffset - 90; y < SCREEN_HEIGHT; y += 90) {
-                for (int lane = 0; lane < LANE_COUNT; lane++) {
-                    int tipoJanela = (lane + y / 90) % 4;
+    DrawText(TextFormat("Vidas: %d", jogo->jogador->vidas), 20, 20, 24, WHITE);
+    DrawText(TextFormat("Pontos: %d", jogo->pontuacao), 20, 50, 24, WHITE);
+}
 
-                    float largura = 55;
-                    float altura = 55;
-
-                    float x = BUILDING_X + lane * LANE_WIDTH + LANE_WIDTH / 2 - largura / 2;
-
-                    DrawTexturePro(
-                        game->windowTexture,
-                        fontes[tipoJanela],
-                        (Rectangle){x, y, largura, altura},
-                        (Vector2){0, 0},
-                        0,
-                        WHITE
-                    );
-                }
-            }
-        }
+void liberar_jogo(Jogo *jogo){
+    if(jogo == NULL){
+        return;
     }
 
-    DrawLine(BUILDING_X + LANE_WIDTH, 0,
-             BUILDING_X + LANE_WIDTH, SCREEN_HEIGHT, GRAY);
-
-    DrawLine(BUILDING_X + LANE_WIDTH * 2, 0,
-             BUILDING_X + LANE_WIDTH * 2, SCREEN_HEIGHT, GRAY);
-
-    desenhar_player(game->player, game->invencibilidade);
-    desenhar_obstaculos(game->obstacles);
-
-    DrawText(TextFormat("Vidas: %d", game->player->vidas), 20, 20, 24, WHITE);
-    DrawText(TextFormat("Score: %d", game->score), 20, 50, 24, WHITE);
-}
-void liberar_jogo(Game *game) {
     descarregar_texturas_obstaculos();
-    liberar_obstaculos(game->obstacles);
-    liberar_player(game->player);
-    for (int i = 0; i < game->totalFramesFundo; i++) {
-        UnloadTexture(game->fundoframes[i]);
-    }
-    UnloadTexture(game->menuTexture);
-    UnloadTexture(game->gameOverTexture);
-    UnloadTexture(game->windowTexture);
-    UnloadMusicStream(game->soundtrack);
-    free(game);
+    liberar_obstaculos(jogo->obstaculos);
+    liberar_jogador(jogo->jogador);
+    descarregar_frames_fundo(jogo);
+    UnloadTexture(jogo->textura_menu);
+    UnloadTexture(jogo->textura_fim_de_jogo);
+    UnloadTexture(jogo->textura_janela);
+    UnloadMusicStream(jogo->musica);
+    free(jogo);
 }
 
-void reiniciar_partida(Game *game){
-    liberar_obstaculos(game->obstacles);
-    liberar_player(game->player);
+void reiniciar_partida(Jogo *jogo){
+    liberar_obstaculos(jogo->obstaculos);
+    liberar_jogador(jogo->jogador);
 
-    game->player = criar_player();
-    game->obstacles = NULL;
-    game->timerSpawn = 0;
-    game->invencibilidade = 0;
-    game->score = 0;
-    game->gameOver = 0;
-    game->screen = PLAYING;
+    jogo->jogador = criar_jogador();
+    jogo->obstaculos = NULL;
+    jogo->tempo_spawn = 0;
+    jogo->invencibilidade = 0;
+    jogo->pontuacao = 0;
+    jogo->deslocamento_fundo = 0;
+    jogo->frame_fundo = 0;
+    jogo->tempo_fundo = 0;
+
+    if(jogo->jogador == NULL){
+        jogo->tela = FIM_DE_JOGO;
+        return;
+    }
+
+    jogo->tela = JOGANDO;
 }

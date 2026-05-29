@@ -32,6 +32,7 @@ Game *criar_jogo() {
     game->frameAtualFundo = 0;
     game->timerFundo = 0;
     game->gameOverTexture = LoadTexture("assets/images/gameover.png");
+    game->windowTexture = LoadTexture("assets/images/windows.png");
     carregar_texturas_obstaculos();
 
     return game;
@@ -193,8 +194,32 @@ void desenhar_jogo(Game *game) {
         for (int lane = 0; lane < LANE_COUNT; lane++) {
             int x = BUILDING_X + lane * LANE_WIDTH + 30;
 
-            DrawRectangle(x, y, 40, 35, YELLOW);
-            DrawRectangleLines(x, y, 40, 35, BLACK);
+            Rectangle fontes[4] = {
+                {0, 0, 208, 208},
+                {208, 0, 208, 208},
+                {0, 208, 208, 208},
+                {208, 208, 208, 208}
+            };
+
+            for (int y = game->backgroundOffset - 90; y < SCREEN_HEIGHT; y += 90) {
+                for (int lane = 0; lane < LANE_COUNT; lane++) {
+                    int tipoJanela = (lane + y / 90) % 4;
+
+                    float largura = 55;
+                    float altura = 55;
+
+                    float x = BUILDING_X + lane * LANE_WIDTH + LANE_WIDTH / 2 - largura / 2;
+
+                    DrawTexturePro(
+                        game->windowTexture,
+                        fontes[tipoJanela],
+                        (Rectangle){x, y, largura, altura},
+                        (Vector2){0, 0},
+                        0,
+                        WHITE
+                    );
+                }
+            }
         }
     }
 
@@ -219,6 +244,7 @@ void liberar_jogo(Game *game) {
     }
     UnloadTexture(game->menuTexture);
     UnloadTexture(game->gameOverTexture);
+    UnloadTexture(game->windowTexture);
     free(game);
 }
 

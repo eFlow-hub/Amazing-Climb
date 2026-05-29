@@ -5,7 +5,6 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:\\msys64\\mingw64\\include",
-                "C:\\msys64\\mingw64\\include\\raylib",
                 "${workspaceFolder}\\src"
             ],
             "defines": [
@@ -14,10 +13,8 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.19041.0",
-            "compilerPath": "C:\\msys64\\mingw64\\bin\\gcc.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-msvc-x64",
             "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],

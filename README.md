@@ -4,6 +4,9 @@ Jogo simples feito em C com raylib. O jogador controla o Homem-Aranha subindo um
 
 O projeto foi organizado para praticar estruturas, ponteiros, alocação dinâmica, lista encadeada e separação de código em módulos.
 
+# Gameplay do jogo
+[![Assista ao vídeo](https://img.youtube.com/vi/ZonGtKrhyEs.jpg)](https://www.youtube.com/watch?v=ZonGtKrhyEs)
+
 ## Como jogar
 
 - `ENTER`: iniciar a partida

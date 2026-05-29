@@ -6,7 +6,9 @@ O projeto foi organizado para praticar estruturas, ponteiros, alocação dinâmi
 
 # Gameplay do jogo
 
-[![Assista ao vídeo](https://img.youtube.com/vi/ZonGtKrhyEs/0.jpg)](https://www.youtube.com/watch?v=ZonGtKrhyEs)
+[![Gameplay do Amazing Climb](https://img.youtube.com/vi/ZonGtKrhyEs/0.jpg)](https://www.youtube.com/watch?v=ZonGtKrhyEs)
+
+Clique na imagem para assistir ao gameplay.
 
 ## Como jogar
 

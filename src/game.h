@@ -27,6 +27,7 @@ typedef struct Game {
     Texture2D menuTexture;
     Texture2D gameOverTexture;
     Texture2D windowTexture;
+    Music soundtrack;
 } Game;
 
 Game *criar_jogo();

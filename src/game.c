@@ -33,6 +33,9 @@ Game *criar_jogo() {
     game->timerFundo = 0;
     game->gameOverTexture = LoadTexture("assets/images/gameover.png");
     game->windowTexture = LoadTexture("assets/images/windows.png");
+    game->soundtrack = LoadMusicStream("assets/soundtrack.opus");
+    game->soundtrack.looping = true;
+    PlayMusicStream(game->soundtrack);
     carregar_texturas_obstaculos();
 
     return game;
@@ -75,6 +78,7 @@ void verificar_colisoes(Game *game) {
 }
 
 void atualizar_jogo(Game *game, float delta) {
+    UpdateMusicStream(game->soundtrack);
     if (game->screen == GAME_OVER) {
         if (IsKeyPressed(KEY_R)) {
             reiniciar_partida(game);
@@ -245,6 +249,7 @@ void liberar_jogo(Game *game) {
     UnloadTexture(game->menuTexture);
     UnloadTexture(game->gameOverTexture);
     UnloadTexture(game->windowTexture);
+    UnloadMusicStream(game->soundtrack);
     free(game);
 }
 

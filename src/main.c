@@ -15,6 +15,8 @@ int main() {
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
 
+        InitAudioDevice();
+
         atualizar_jogo(game, delta);
 
         BeginDrawing();
@@ -26,6 +28,8 @@ int main() {
     }
 
     liberar_jogo(game);
+
+    CloseAudioDevice();
 
     CloseWindow();
 

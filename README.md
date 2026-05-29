@@ -41,7 +41,7 @@ make
 ## Estrutura
 
 ```text
-PIF_Game/
+Amazing-Climb/
 ├── Makefile
 ├── README.md
 ├── assets/

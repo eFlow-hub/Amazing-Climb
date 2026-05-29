@@ -5,6 +5,7 @@
 #define ALTURA_TELA 600
 
 #define TITULO_JOGO "Amazing Climb"
+#define ARQUIVO_RECORDE "score.txt"
 
 #define LARGURA_JOGADOR 50
 #define ALTURA_JOGADOR 70

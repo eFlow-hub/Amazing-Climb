@@ -15,6 +15,8 @@ O projeto foi organizado para praticar estruturas, ponteiros, alocação dinâmi
 
 O prédio tem três faixas. Os obstáculos aparecem em uma ou duas faixas por vez, deixando sempre pelo menos uma passagem livre. Cada obstáculo evitado soma ponto. Ao bater, o jogador perde uma vida e fica invencível por um curto período.
 
+O recorde é salvo em `score.txt`, na pasta do jogo, e carregado de novo na próxima execução.
+
 ## Compilação
 
 No Windows com MSYS2/MINGW64:
@@ -62,7 +64,6 @@ PIF_Game/
 
 ## Ideias futuras
 
-- Salvar o recorde em arquivo
 - Adicionar som de colisão
 - Aumentar a dificuldade aos poucos
 - Melhorar a tela de menu

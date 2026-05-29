@@ -18,6 +18,38 @@ static void descarregar_frames_fundo(Jogo *jogo){
     }
 }
 
+static int carregar_recorde(void){
+    FILE *arquivo = fopen(ARQUIVO_RECORDE, "r");
+    int recorde = 0;
+
+    if(arquivo == NULL){
+        return 0;
+    }
+
+    if(fscanf(arquivo, "%d", &recorde) != 1){
+        recorde = 0;
+    }
+
+    fclose(arquivo);
+
+    if(recorde < 0){
+        return 0;
+    }
+
+    return recorde;
+}
+
+static void salvar_recorde(int recorde){
+    FILE *arquivo = fopen(ARQUIVO_RECORDE, "w");
+
+    if(arquivo == NULL){
+        return;
+    }
+
+    fprintf(arquivo, "%d\n", recorde);
+    fclose(arquivo);
+}
+
 static void desenhar_textura_tela(Texture2D textura){
     DrawTexturePro(
         textura,
@@ -88,6 +120,7 @@ static void verificar_colisoes(Jogo *jogo){
 
                 if(jogo->pontuacao > jogo->recorde){
                     jogo->recorde = jogo->pontuacao;
+                    salvar_recorde(jogo->recorde);
                 }
             }
 
@@ -117,7 +150,7 @@ Jogo *criar_jogo(void){
     jogo->tempo_spawn = 0;
     jogo->invencibilidade = 0;
     jogo->pontuacao = 0;
-    jogo->recorde = 0;
+    jogo->recorde = carregar_recorde();
     jogo->deslocamento_fundo = 0;
     jogo->tela = MENU;
     jogo->frame_fundo = 0;

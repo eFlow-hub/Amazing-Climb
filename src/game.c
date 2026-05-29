@@ -33,7 +33,7 @@ Game *criar_jogo() {
     game->timerFundo = 0;
     game->gameOverTexture = LoadTexture("assets/images/gameover.png");
     game->windowTexture = LoadTexture("assets/images/windows.png");
-    game->soundtrack = LoadMusicStream("assets/soundtrack.opus");
+    game->soundtrack = LoadMusicStream("assets/soundtrack.mp3");
     game->soundtrack.looping = true;
     PlayMusicStream(game->soundtrack);
     carregar_texturas_obstaculos();

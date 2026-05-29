@@ -10,12 +10,12 @@ int main() {
 
     srand(time(NULL));
 
+    InitAudioDevice();
+
     Game *game = criar_jogo();
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
-
-        InitAudioDevice();
 
         atualizar_jogo(game, delta);
 
